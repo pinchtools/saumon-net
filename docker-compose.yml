@@ -1,0 +1,18 @@
+services:
+  postgresql:
+    image: postgres:17-alpine
+    restart: always
+    volumes:
+      - ~/data/postgres/saumon-net:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=foo
+  web:
+    build: .
+    volumes:
+      - .:/rails
+    depends_on:
+        - postgresql
+    environment:
+      - POSTGRES_PASSWORD=foo
+    ports:
+      - "3004:3000"
