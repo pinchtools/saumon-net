@@ -23,8 +23,10 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Use redis for cache
 gem "redis"
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
-gem "solid_queue"
+# Use sidekiq for async job processing
+gem "sidekiq"
+
+# Use the database-backed adapters for Action Cable
 gem "solid_cable"
 
 # Reduces boot times through caching; required in config/boot.rb

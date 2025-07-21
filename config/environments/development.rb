@@ -26,6 +26,8 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :redis_cache_store, { url: ENV["REDIS_URL"] }
 
+  config.active_job.queue_adapter = :sidekiq
+
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
 

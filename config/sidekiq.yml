@@ -1,0 +1,12 @@
+# config/sidekiq.yml
+:concurrency: <%= ENV.fetch("SIDEKIQ_CONCURRENCY", 5) %>
+
+:queues:
+  - [critical, 3]     # Highest priority for urgent jobs
+  - [default, 2]      # Standard priority
+  - [mailers, 2]      # Email sending queue
+  - [low, 1]          # Background tasks that can wait
+
+:scheduler:
+  :schedule:
+    # Add your scheduled jobs here if needed
