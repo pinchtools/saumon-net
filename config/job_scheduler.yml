@@ -1,0 +1,19 @@
+# supported formats https://github.com/floraison/fugit#fugitnat
+
+#c = Fugit.parse('* * * * *') # every minute
+#c = Fugit.parse('5 * * * *') # every hour at minute 5
+#c = Fugit.parse('* * * * * *') # every second
+#c = Fugit.parse('5 * * * * *') # every minute at second 5
+
+#my_first_job:
+#  cron: "*/5 * * * *"
+#  namespace: "default"
+#  class: "HardWorker"
+#  queue: default
+#
+#second_job:
+#  cron: "*/30 * * * *" # execute at every 30 minutes
+#  class: "HardWorker"
+#  queue: default
+#  args:
+#    hard: "stuff"

@@ -25,6 +25,7 @@ gem "redis"
 
 # Use sidekiq for async job processing
 gem "sidekiq"
+gem "sidekiq-cron"
 
 # Use the database-backed adapters for Action Cable
 gem "solid_cable"
