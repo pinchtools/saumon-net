@@ -281,6 +281,10 @@ GEM
     rdoc (6.14.1)
       erb
       psych (>= 4.0.0)
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.25.1)
+      connection_pool
     regexp_parser (2.10.0)
     reline (0.6.1)
       io-console (~> 0.5)
@@ -352,10 +356,6 @@ GEM
       activejob (>= 7.2)
       activerecord (>= 7.2)
       railties (>= 7.2)
-    solid_cache (1.0.7)
-      activejob (>= 7.2)
-      activerecord (>= 7.2)
-      railties (>= 7.2)
     solid_queue (1.1.5)
       activejob (>= 7.1)
       activerecord (>= 7.1)
@@ -418,12 +418,12 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
+  redis
   rspec-rails
   rubocop-rails-omakase
   selenium-webdriver
   shoulda-matchers
   solid_cable
-  solid_cache
   solid_queue
   thruster
   tzinfo-data

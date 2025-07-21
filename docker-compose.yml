@@ -6,6 +6,11 @@ services:
       - ~/data/postgres/saumon-net:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=foo
+  redis:
+    image: redis:8-alpine
+    restart: always
+    ports:
+      - "6379:6379"
   web:
     build: .
     volumes:
@@ -14,5 +19,7 @@ services:
         - postgresql
     environment:
       - POSTGRES_PASSWORD=foo
+      - REDIS_URL=redis://redis:6379/0
+
     ports:
       - "3004:3000"
