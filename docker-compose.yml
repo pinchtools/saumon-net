@@ -29,6 +29,7 @@ services:
     volumes:
       - .:/app
     environment:
+      - POSTGRES_PASSWORD=foo
       - REDIS_SIDEKIQ_URL=redis://redis:6379/1
       - REDIS_CACHE_URL=redis://redis:6379/0
     depends_on:
