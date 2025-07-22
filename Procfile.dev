@@ -1,1 +1,2 @@
 web: env RUBY_DEBUG_OPEN=true bundle exec puma -C /rails/config/puma.rb
+sidekiq: bundle exec sidekiq -C /rails/config/sidekiq.yml
