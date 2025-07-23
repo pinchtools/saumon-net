@@ -18,8 +18,6 @@
 #  args:
 #    hard: "stuff"
 
-test_job:
-  cron: "* * * * *"
-  namespace: "default"
-  class: "TestJob"
-  queue: "default"
+sidekiq_job_report_queue_sizes:
+  cron: "*/5 * * * *"
+  class: "SidekiqJob::ReportQueueSizesJob"
