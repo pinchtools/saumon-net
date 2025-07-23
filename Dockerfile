@@ -2,7 +2,7 @@
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.4.2
-FROM ruby:$RUBY_VERSION-alpine AS base
+FROM ruby:$RUBY_VERSION AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -15,12 +15,19 @@ WORKDIR /rails
 
 
 # Install packages needed to build gems
-RUN apk update \
-&& apk upgrade \
-&& apk add --update --no-cache \
-    build-base git libpq-dev tzdata libffi-dev \
-    pkgconf python3 py3-pip yaml-dev\
-    curl vips-dev
+RUN apt-get update -qq && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    libpq-dev \
+    tzdata \
+    libffi-dev \
+    pkg-config \
+    python3 \
+    python3-pip \
+    libyaml-dev \
+    curl \
+    libvips-dev
 
 
 COPY Gemfile Gemfile.lock ./
@@ -36,9 +43,10 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Install packages needed for deployment
-RUN apk update \
-&& apk upgrade \
-&& apk add --update --no-cache postgresql-client bash
+RUN apt-get update -qq && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    postgresql-client \
+    bash
 
 RUN chmod +x bin/dev
 
