@@ -49,5 +49,5 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Lint code for consistent style
+      - name: Run specs
         run: bin/rspec
