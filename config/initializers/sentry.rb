@@ -3,6 +3,7 @@
 Sentry.init do |config|
   config.breadcrumbs_logger = [ :active_support_logger ]
   config.dsn = Rails.application.credentials.sentry.dsn!
+  config.environments = %w[development staging production]
 
   config.breadcrumbs_logger = [ :active_support_logger, :http_logger ]
 
