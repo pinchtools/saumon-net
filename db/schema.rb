@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_29_153120) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_30_141138) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -27,6 +27,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_29_153120) do
     t.index ["fingerprint"], name: "index_downloads_on_fingerprint_where_current_true", unique: true, where: "(current = true)"
     t.index ["name"], name: "index_downloads_on_name"
     t.index ["source_id"], name: "index_downloads_on_source_id"
+  end
+
+  create_table "entities", force: :cascade do |t|
+    t.string "uid", null: false
+    t.string "type", null: false
+    t.jsonb "metadata"
+    t.bigint "download_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["download_id"], name: "index_entities_on_download_id"
+    t.index ["metadata"], name: "index_entities_on_metadata", using: :gin
+    t.index ["type"], name: "index_entities_on_type"
+    t.index ["uid"], name: "index_entities_on_uid", unique: true
   end
 
   create_table "sources", force: :cascade do |t|
