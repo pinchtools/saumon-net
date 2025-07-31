@@ -55,8 +55,6 @@ jobs:
           --health-retries 5
 
     env:
-      POSTGRES_HOST: localhost
-      POSTGRES_PASSWORD: password
       RAILS_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_TEST }}
     steps:
