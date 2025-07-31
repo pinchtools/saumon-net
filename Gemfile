@@ -43,6 +43,10 @@ gem "thruster", require: false
 
 gem "dotenv", "~> 3.1"
 
+gem "httparty", "~> 0.23.1"
+
+gem "nokogiri", "~> 1.18"
+
 gem "decent_exposure"
 
 # Tracing, debugging
