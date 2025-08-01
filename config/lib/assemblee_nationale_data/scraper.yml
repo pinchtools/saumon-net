@@ -1,0 +1,15 @@
+actor:
+  AOCUR:
+    url: "/acteurs/deputes-en-exercice"
+    code: AMO40
+    annotation: "Split actors and organisms of the current "
+    dirs:
+      - pays
+  AOCOMP:
+    url: "/acteurs/historique-des-deputes"
+    code: AMO30
+    annotation: "Complete deputies histories"
+  AOCOMP16:
+    url: "/archives-16e/historique-des-deputes"
+    code: AMO30
+    annotation: "Complete deputies histories"
