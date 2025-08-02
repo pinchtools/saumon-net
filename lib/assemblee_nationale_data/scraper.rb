@@ -5,16 +5,16 @@ module AssembleeNationaleData
 
     def initialize
       @headers = {
-        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
       }
 
-      @config_file = YAML.load_file(Rails.root.join('config', 'lib', 'assemblee_nationale_data', 'scraper.yml'))
+      @config_file = YAML.load_file(Rails.root.join("config", "lib", "assemblee_nationale_data", "scraper.yml"))
     end
 
     def fetch_dataset(dataset_type, dataset_code)
       config = load_dataset_config(dataset_type, dataset_code)
 
-      response = HTTParty.get([base_url, config.dig("url")].join, headers: @headers)
+      response = HTTParty.get([ base_url, config.dig("url") ].join, headers: @headers)
 
       if response.success?
         doc = Nokogiri::HTML(response.body)
@@ -30,9 +30,9 @@ module AssembleeNationaleData
         downloads = {
           json: json_link
         }
-        #json: download_file(json_link)
+        # json: download_file(json_link)
 
-        #save_files(downloads)
+        # save_files(downloads)
 
         downloads
       else
@@ -50,7 +50,7 @@ module AssembleeNationaleData
     def download_file(url)
       return nil unless url
 
-      full_url = url.start_with?('http') ? url : "#{AssembleeNationaleData.base_url}#{url}"
+      full_url = url.start_with?("http") ? url : "#{AssembleeNationaleData.base_url}#{url}"
       response = HTTParty.get(full_url, headers: @headers)
 
       if response.success?
