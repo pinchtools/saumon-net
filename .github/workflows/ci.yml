@@ -57,6 +57,8 @@ jobs:
     env:
       RAILS_ENV: test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY_TEST }}
+      POSTGRES_HOST: localhost
+      POSTGRES_PASSWORD: password
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
