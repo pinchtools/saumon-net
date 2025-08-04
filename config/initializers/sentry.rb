@@ -25,5 +25,4 @@ Sentry.init do |config|
   #     0.1  # Sample 10% of everything else
   #   end
   # end
-
 end
