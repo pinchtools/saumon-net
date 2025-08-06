@@ -1,4 +1,8 @@
 module Telescope
+  autoload :Dispatcher, "telescope/dispatcher"
+  autoload :Configuration, "telescope/configuration"
+  autoload :Controllable, "telescope/controllable"
+
   # Base error class for all Telescope errors
   class Error < StandardError; end
 
@@ -45,7 +49,7 @@ module Telescope
     def enrich_context(context)
       context.merge(
         environment: Rails.env,
-        timestamp: Time.current,
+        timestamp: Time.current.to_i,
         process_id: Process.pid
       )
     end
