@@ -14,9 +14,12 @@ module Telescope
 
           if block_given?
             start_time = Time.current
-            yield
-            duration = Time.current - start_time
-            Rails.logger.info("[Telescope] #{name} completed in #{duration}s")
+            begin
+              yield
+            ensure
+              duration = Time.current - start_time
+              Rails.logger.info("[Telescope] #{name} completed in #{duration}s")
+            end
           end
         end
       end
