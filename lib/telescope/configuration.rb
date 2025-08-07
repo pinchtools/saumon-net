@@ -6,7 +6,6 @@ module Telescope
     def initialize
       @environments = %w[development test staging production]
       @filtered_parameters = Rails.application.config.filter_parameters
-      @adapters = []
     end
 
     def adapters
@@ -29,10 +28,10 @@ module Telescope
             true
           else
             # Use standard sampling rate for regular traces
-            rand <= sampling_rate
+            Random.rand <= sampling_rate
           end
         else
-          rand <= sampling_rate
+          Random.rand <= sampling_rate
         end
       }
     end
