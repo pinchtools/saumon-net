@@ -5,7 +5,8 @@ module Telescope
         raise InvalidContextError, "Context must be a Hash" unless context.is_a?(Hash)
 
         return yield if block_given? && !enabled?
-        return yield if block_given? && !should_sample?
+        return yield if block_given? && !should_sample?(type, context)
+        return if !should_sample?(type, context)
 
         if should_dispatch_async?(type, context)
           dispatch_async(type, payload, context)
