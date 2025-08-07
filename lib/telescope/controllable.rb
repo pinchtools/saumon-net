@@ -30,7 +30,8 @@ module Telescope
         url: request.url,
         method: request.method,
         remote_ip: request.remote_ip,
-        user_agent: request.user_agent
+        user_agent: request.user_agent,
+        format: request.format.to_s
       }
     end
 
