@@ -3,6 +3,10 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  config.after_initialize do
+    Rails.application.routes.default_url_options[:host] = 'localhost:3004'
+  end
+
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 
@@ -23,6 +27,8 @@ Rails.application.configure do
     config.action_controller.perform_caching = false
   end
 
+  config.action_controller.default_url_options = { host: "localhost", port: 3004 }
+
   # Change to :null_store to avoid any caching.
   config.cache_store = :redis_cache_store, { url: ENV["REDIS_URL"] }
 
@@ -38,7 +44,7 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3004 }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
