@@ -1,3 +1,5 @@
+require 'rails_helper'
+
 RSpec.describe Telescope::RescueWrapper do
   context 'when rescue_with_handler is defined and return true' do
     let(:test_class) do
