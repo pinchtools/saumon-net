@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Download, type: :model do
   describe "relations" do
     it { should belong_to(:source) }
+    it { should have_one_attached(:file) }
   end
 
   describe "validations" do
