@@ -2,6 +2,8 @@ module Telescope
   autoload :Dispatcher, "telescope/dispatcher"
   autoload :Configuration, "telescope/configuration"
   autoload :Controllable, "telescope/controllable"
+  autoload :Rescuable, "telescope/rescuable"
+  autoload :RescueWrapper, "telescope/rescue_wrapper"
 
   # Base error class for all Telescope errors
   class Error < StandardError; end
