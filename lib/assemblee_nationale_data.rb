@@ -17,4 +17,5 @@ module AssembleeNationaleData
   autoload :Configurable, "assemblee_nationale_data/configurable"
   autoload :Scraper, "assemblee_nationale_data/scraper"
   autoload :Version, "assemblee_nationale_data/version"
+  autoload :Rescuable, "assemblee_nationale_data/rescuable"
 end
