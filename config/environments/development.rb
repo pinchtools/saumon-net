@@ -4,7 +4,7 @@ Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
   config.after_initialize do
-    Rails.application.routes.default_url_options[:host] = 'localhost:3004'
+    Rails.application.routes.default_url_options[:host] = "localhost:3004"
   end
 
   # Make code changes take effect immediately without server restart.
