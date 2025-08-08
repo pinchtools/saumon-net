@@ -7,3 +7,5 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+Source.create(name: "Assemblee Nationale Open Data", code: "ANOD") unless Source.find_by_code("ANOD")
