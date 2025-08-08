@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Source, type: :model do
+  describe "relationships" do
+    it { should have_many(:downloads) }
+  end
+
   describe "validations" do
     let(:name) { "AN_OPENDATA" }
     let(:code) { "ABC" }
