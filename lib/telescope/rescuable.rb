@@ -2,7 +2,7 @@ module Telescope
   module Rescuable
     extend ActiveSupport::Concern
     include ActiveSupport::Rescuable
-    prepend RescueWrapper
+    prepend Telescope::RescueWrapper
 
     included do
       rescue_from StandardError, with: :report_general_error
