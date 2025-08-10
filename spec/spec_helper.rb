@@ -1,6 +1,7 @@
 require 'factory_bot'
 require 'factory_bot_rails'
 require 'shoulda-matchers'
+require 'webmock/rspec'
 require 'faker'
 require 'telescope'
 require 'assemblee_nationale_data'

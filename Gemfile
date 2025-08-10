@@ -83,4 +83,5 @@ group :test do
   gem "faker", require: false
   gem "rspec-rails", require: false
   gem "factory_bot_rails", require: false
+  gem "webmock", require: false
 end
