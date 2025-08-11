@@ -23,7 +23,7 @@ module Telescope
   # Context related errors
   class ContextError < Error; end
   class InvalidContextError < ContextError; end
-
+  class NetworkError < StandardError; end
 
   class << self
     def configure

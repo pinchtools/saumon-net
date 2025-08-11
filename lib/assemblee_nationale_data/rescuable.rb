@@ -5,11 +5,8 @@ module AssembleeNationaleData
 
     included do
       class_eval do
-        # Define custom error class
-        class NetworkError < StandardError; end
-
         # Set up rescue handler for the custom error
-        rescue_from NetworkError, with: :report_network_error
+        rescue_from Telescope::NetworkError, with: :report_network_error
         rescue_from ActiveRecord::RecordInvalid, with: :report_active_record_error
         rescue_from ActiveRecord::RecordNotSaved, with: :report_active_record_error
         rescue_from ActiveRecord::NotNullViolation, with: :report_active_record_error

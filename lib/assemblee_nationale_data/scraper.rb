@@ -26,7 +26,7 @@ module AssembleeNationaleData
       response = HTTParty.get([ base_url, config.dig("url") ].join, headers: @headers)
 
       unless response.success?
-        raise NetworkError, "Failed to fetch data: #{response.code}"
+        raise Telescope::NetworkError, "Failed to fetch data: #{response.code}"
       end
 
       doc = Nokogiri::HTML(response.body)
@@ -50,11 +50,11 @@ module AssembleeNationaleData
       end
 
       save_file(json_uri, dataset_code)
-    rescue NetworkError => e
+    rescue Telescope::NetworkError => e
       # we re-raised network error so it can be retry by async job
       raise e
     rescue => e
-      Telescope.capture_error(e, error_context)
+      Telescope.capture_error(e, default_context)
       nil
     end
 
@@ -65,36 +65,11 @@ module AssembleeNationaleData
     end
 
     def save_file(uri, dataset_code)
-      # todo should check the fingerprint before instantiating && the checksum
-      # create a specific service to return a download to attach the file or return nil
-      # when we have to ignore the download
-      fingerprint = Digest::MD5.hexdigest(dataset_code + uri.to_s)
-      name = uri.path.split("/").last
-
-      download = @source.downloads.new(fingerprint: fingerprint, name: name)
-
-      download_file(uri.to_s) do |response|
-        download.file.attach(
-          io: StringIO.new(response.body),
-          filename: name,
-          content_type: response.headers["content-type"]  # Gets content type from response
-        )
-      end
-
-      download.tap(&:save!)
-    end
-
-    def download_file(url)
-      return nil unless url
-
-      raise StandardError, "Expect a block to be given" unless block_given?
-
-      full_url = url.start_with?("http") ? url : "#{AssembleeNationaleData.base_url}#{url}"
-      response = HTTParty.get(full_url, headers: @headers)
-
-      raise NetworkError, "Failed to download file from #{url}: #{response.code}" unless response.success?
-
-      yield response
+      DownloadProcessorService.new(
+        uri: uri,
+        dataset_code: dataset_code,
+        source: @source
+      ).call
     end
   end
 end

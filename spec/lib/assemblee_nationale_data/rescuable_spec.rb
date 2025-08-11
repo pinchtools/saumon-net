@@ -8,7 +8,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
       attr_reader :error_context_received
 
       def trigger_network_error
-        raise self.class::NetworkError, "network failure"
+        raise Telescope::NetworkError, "network failure"
       end
 
       def trigger_record_invalid
@@ -41,7 +41,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
   describe 'NetworkError handling' do
     it 'captures and re-raises network errors' do
       expect(Telescope).to receive(:capture_error).with(
-        kind_of(test_class::NetworkError),
+        kind_of(Telescope::NetworkError),
         hash_including(
           error_type: "network",
           class: test_class.name,
@@ -49,7 +49,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
         )
       )
 
-      expect { instance.trigger_network_error }.to raise_error(test_class::NetworkError)
+      expect { instance.trigger_network_error }.to raise_error(Telescope::NetworkError)
     end
   end
 

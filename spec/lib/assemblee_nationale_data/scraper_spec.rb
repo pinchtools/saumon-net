@@ -52,27 +52,29 @@ RSpec.describe AssembleeNationaleData::Scraper do
         </html>
       HTML
     end
-    let(:json_content) { '{"data": "test"}' }
+    let(:download) { create(:download, source: source, name: 'test_code.json') }
+    let(:download_processor_service) { instance_double(DownloadProcessorService) }
 
     before do
+      # Mock the HTML page request (this stays the same)
       stub_request(:get, "#{AssembleeNationaleData.base_url}/test/path")
         .to_return(status: 200, body: html_response)
 
-      stub_request(:get, "#{AssembleeNationaleData.base_url}/test_code.json")
-        .to_return(
-          status: 200,
-          body: json_content,
-          headers: { 'content-type' => 'application/json' }
-        )
+      # Mock the DownloadProcessorService instead of the actual file download
+      allow(DownloadProcessorService).to receive(:new).and_return(download_processor_service)
+      allow(download_processor_service).to receive(:call).and_return(download)
     end
 
     it 'successfully fetches and saves dataset' do
-      download = scraper.fetch_dataset(dataset_type, dataset_code)
-      expect(download).to be_a(Download)
-      expect(download.name).to eq('test_code.json')
-      expect(download.fingerprint).to eq(
-                                        Digest::MD5.hexdigest("#{dataset_code}#{AssembleeNationaleData.base_url}/test_code.json")
-                                      )
+      result = scraper.fetch_dataset(dataset_type, dataset_code)
+
+      expect(DownloadProcessorService).to have_received(:new).with(
+        uri: URI.parse("#{AssembleeNationaleData.base_url}/test_code.json"),
+        dataset_code: dataset_code,
+        source: source
+      )
+      expect(download_processor_service).to have_received(:call)
+      expect(result).to eq(download)
     end
 
     context 'when dataset configuration is missing' do
@@ -80,6 +82,11 @@ RSpec.describe AssembleeNationaleData::Scraper do
 
       it 'returns nil' do
         expect(scraper.fetch_dataset(dataset_type, dataset_code)).to be_nil
+      end
+
+      it 'does not call DownloadProcessorService' do
+        scraper.fetch_dataset(dataset_type, dataset_code)
+        expect(DownloadProcessorService).not_to have_received(:new)
       end
     end
 
@@ -91,17 +98,23 @@ RSpec.describe AssembleeNationaleData::Scraper do
 
       it 'raises NetworkError' do
         expect { scraper.fetch_dataset(dataset_type, dataset_code) }
-          .to raise_error(described_class::NetworkError, "Failed to fetch data: 500")
+          .to raise_error(Telescope::NetworkError, "Failed to fetch data: 500")
       end
 
       it 'reports error to Telescope' do
         expect(Telescope).to receive(:capture_error).with(
-          instance_of(described_class::NetworkError),
+          instance_of(Telescope::NetworkError),
           instance_of(Hash)
         )
 
         expect { scraper.fetch_dataset(dataset_type, dataset_code) }
-          .to raise_error(described_class::NetworkError)
+          .to raise_error(Telescope::NetworkError)
+      end
+
+      it 'does not call DownloadProcessorService' do
+        expect { scraper.fetch_dataset(dataset_type, dataset_code) }
+          .to raise_error(Telescope::NetworkError)
+        expect(DownloadProcessorService).not_to have_received(:new)
       end
     end
 
@@ -120,14 +133,51 @@ RSpec.describe AssembleeNationaleData::Scraper do
 
         scraper.fetch_dataset(dataset_type, dataset_code)
       end
+
+      it 'does not call DownloadProcessorService' do
+        scraper.fetch_dataset(dataset_type, dataset_code)
+        expect(DownloadProcessorService).not_to have_received(:new)
+      end
+    end
+
+    context 'when DownloadProcessorService fails' do
+      before do
+        allow(download_processor_service).to receive(:call)
+                                               .and_raise(Telescope::NetworkError.new("Download failed"))
+      end
+
+      it 'propagates the service error' do
+        expect { scraper.fetch_dataset(dataset_type, dataset_code) }
+          .to raise_error(Telescope::NetworkError, "Download failed")
+      end
     end
 
     context 'with different file formats' do
-      it 'supports zip files' do
-        stub_request(:get, "#{AssembleeNationaleData.base_url}test/path")
-          .to_return(status: 200, body: '<a href="test_code.json.zip">Download ZIP</a>')
+      let(:html_response) { '<a href="test_code.json.zip">Download ZIP</a>' }
 
-        expect(scraper.fetch_dataset(dataset_type, dataset_code)).to be_a(Download)
+      it 'supports zip files' do
+        result = scraper.fetch_dataset(dataset_type, dataset_code)
+
+        expect(DownloadProcessorService).to have_received(:new).with(
+          uri: URI.parse("#{AssembleeNationaleData.base_url}/test_code.json.zip"),
+          dataset_code: dataset_code,
+          source: source
+        )
+        expect(result).to eq(download)
+      end
+    end
+
+    context 'with relative URLs' do
+      let(:html_response) { '<a href="/relative/test_code.json">Download</a>' }
+
+      it 'converts relative URLs to absolute' do
+        scraper.fetch_dataset(dataset_type, dataset_code)
+
+        expect(DownloadProcessorService).to have_received(:new).with(
+          uri: URI.parse("#{AssembleeNationaleData.base_url}/relative/test_code.json"),
+          dataset_code: dataset_code,
+          source: source
+        )
       end
     end
   end
@@ -140,44 +190,40 @@ RSpec.describe AssembleeNationaleData::Scraper do
       end
     end
 
-    describe '#download_file' do
-      let(:url) { 'http://example.com/file.json' }
-      let(:response_body) { '{"data": "test"}' }
+    describe '#save_file' do
+      let(:uri) { URI.parse('http://example.com/test_file.json') }
+      let(:dataset_code) { 'test_dataset' }
+      let(:download_processor_service) { instance_double(DownloadProcessorService) }
+      let(:download) { create(:download, source: source) }
 
       before do
-        stub_request(:get, url)
-          .to_return(status: 200, body: response_body)
+        allow(DownloadProcessorService).to receive(:new)
+                                             .with(uri: uri, dataset_code: dataset_code, source: source)
+                                             .and_return(download_processor_service)
+        allow(download_processor_service).to receive(:call).and_return(download)
       end
 
-      it 'yields the response when successful' do
-        expect { |b| scraper.send(:download_file, url, &b) }.to yield_with_args(
-                                                                  having_attributes(body: response_body)
-                                                                )
+      it 'delegates to DownloadProcessorService with correct parameters' do
+        result = scraper.send(:save_file, uri, dataset_code)
+
+        expect(DownloadProcessorService).to have_received(:new).with(
+          uri: uri,
+          dataset_code: dataset_code,
+          source: source
+        )
+        expect(download_processor_service).to have_received(:call)
+        expect(result).to eq(download)
       end
 
-      it 'raises error when no block given' do
-        expect { scraper.send(:download_file, url) }
-          .to raise_error(StandardError, "Expect a block to be given")
-      end
-
-      context 'when request fails' do
+      context 'when DownloadProcessorService raises an error' do
         before do
-          stub_request(:get, url).to_return(status: 404)
+          allow(download_processor_service).to receive(:call)
+                                                 .and_raise(Telescope::NetworkError.new("Network failed"))
         end
 
-        it 'raises NetworkError' do
-          expect { scraper.send(:download_file, url) { } }
-            .to raise_error(described_class::NetworkError, /Failed to download file/)
-        end
-
-        it 'reports error to Telescope' do
-          expect(Telescope).to receive(:capture_error).with(
-            instance_of(described_class::NetworkError),
-            instance_of(Hash)
-          )
-
-          expect { scraper.send(:download_file, url) { } }
-            .to raise_error(described_class::NetworkError)
+        it 'propagates the error' do
+          expect { scraper.send(:save_file, uri, dataset_code) }
+            .to raise_error(Telescope::NetworkError, "Network failed")
         end
       end
     end
