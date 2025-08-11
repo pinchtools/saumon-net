@@ -46,6 +46,10 @@ module Telescope
       end
     end
 
+    def log(message, context = {})
+      Dispatcher.dispatch(:log, message, enrich_context(context))
+    end
+
     private
 
     def enrich_context(context)
