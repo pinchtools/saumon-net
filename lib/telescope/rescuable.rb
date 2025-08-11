@@ -11,11 +11,11 @@ module Telescope
     private
 
     def report_general_error(error)
-      Telescope.capture_error(error, error_context)
+      Telescope.capture_error(error, default_context)
       raise error
     end
 
-    def error_context
+    def default_context
       {
         class: self.class.name,
         timestamp: Time.current

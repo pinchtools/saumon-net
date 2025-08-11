@@ -19,14 +19,14 @@ module AssembleeNationaleData
     private
 
     def report_network_error(error)
-      Telescope.capture_error(error, error_context.merge(error_type: "network"))
+      Telescope.capture_error(error, default_context.merge(error_type: "network"))
       raise error
     end
 
     # send exception to telescope but do not raise has it will be retry
     # if async without succeeding
     def report_active_record_error(error)
-      Telescope.capture_error(error, error_context.merge(error_type: "record"))
+      Telescope.capture_error(error, default_context.merge(error_type: "record"))
     end
   end
 end
