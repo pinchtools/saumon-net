@@ -26,6 +26,21 @@ RSpec.describe Telescope::Adapters::Sentry do
     allow(hub).to receive(:get_current_scope).and_return(scope)
   end
 
+  shared_examples "when sentry is not configured" do |method_name, *args|
+    before do
+      allow(hub).to receive(:initialized?).and_return(false)
+    end
+
+    it 'raises AdapterConfigurationError' do
+      expect {
+        described_class.public_send(method_name, *args)
+      }.to raise_error(
+             Telescope::AdapterConfigurationError,
+             'Sentry is not configured'
+           )
+    end
+  end
+
   describe '.send_error' do
     let(:error) { StandardError.new('test error') }
 
@@ -58,18 +73,43 @@ RSpec.describe Telescope::Adapters::Sentry do
     end
 
     context 'when Sentry is not configured' do
-      before do
-        allow(hub).to receive(:initialized?).and_return(false)
+      include_examples "when sentry is not configured", :send_error, StandardError.new('test error')
+    end
+  end
+
+  describe '.send_log' do
+    let(:message) { 'test log message' }
+    let(:logger) { instance_double('Sentry::Logger') }
+
+    before do
+      allow(hub).to receive(:logger).and_return(logger)
+      allow(logger).to receive(:info)
+      allow(logger).to receive(:warn)
+    end
+
+    context 'when Sentry is configured' do
+      shared_examples "when logging with priority" do |priority, logger_method|
+        let(:context_with_priority) { context.merge(priority: priority) }
+
+        it "logs message with #{priority} level" do
+          expect(logger).to receive(logger_method).with(message)
+          expect(scope).to receive(:set_extras).with(context_with_priority)
+
+          described_class.send_log(message, context_with_priority)
+        end
       end
 
-      it 'raises AdapterConfigurationError' do
-        expect {
-          described_class.send_error(error, context)
-        }.to raise_error(
-               Telescope::AdapterConfigurationError,
-               'Sentry is not configured'
-             )
+      context 'with info priority in context' do
+        include_examples "when logging with priority", :info, :info
       end
+
+      context 'with high priority in context' do
+        include_examples "when logging with priority", :high, :warn
+      end
+    end
+
+    context 'when Sentry is not configured' do
+      include_examples "when sentry is not configured", :send_log, "test log message"
     end
   end
 
@@ -163,18 +203,7 @@ RSpec.describe Telescope::Adapters::Sentry do
     end
 
     context 'when Sentry is not configured' do
-      before do
-        allow(hub).to receive(:initialized?).and_return(false)
-      end
-
-      it 'raises AdapterConfigurationError' do
-        expect do
-          described_class.send_trace(trace_name, payload, context)
-        end.to raise_error(
-                 Telescope::AdapterConfigurationError,
-                 'Sentry is not configured'
-               )
-      end
+      it_behaves_like "when sentry is not configured", :send_trace, 'test.operation', {}
     end
   end
 

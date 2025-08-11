@@ -4,6 +4,7 @@ Sentry.init do |config|
   config.breadcrumbs_logger = [ :active_support_logger, :http_logger ]
   config.dsn = Rails.application.credentials.sentry.dsn!
   config.enabled_environments = %w[development staging production]
+  config.enable_logs = true
 
   # Add data like request headers and IP for users,
   # see https://docs.sentry.io/platforms/ruby/data-management/data-collected/ for more info

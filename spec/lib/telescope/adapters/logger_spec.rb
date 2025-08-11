@@ -24,6 +24,29 @@ RSpec.describe Telescope::Adapters::Logger do
     end
   end
 
+  describe '.send_log' do
+    let(:message) { 'test message' }
+    let(:context) { { user_id: 1, action: 'create' } }
+
+    shared_examples 'logs message with context' do |log_level|
+      it "logs message using #{log_level}" do
+        expect(rails_logger).to receive(:send).with(log_level, '[Telescope] test message')
+        expect(rails_logger).to receive(:send).with(log_level, context.to_json)
+
+        described_class.send_log(message, context)
+      end
+    end
+
+    context 'with high priority' do
+      let(:context) { { user_id: 1, action: 'create', priority: :high } }
+      include_examples 'logs message with context', :warn
+    end
+
+    context 'with normal priority' do
+      include_examples 'logs message with context', :info
+    end
+  end
+
   describe '.send_trace' do
     let(:trace_name) { 'test_operation' }
     let(:context) { { user_id: 1, action: 'create' } }

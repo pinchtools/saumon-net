@@ -14,6 +14,12 @@ RSpec.describe Telescope::Dispatcher do
   end
 
   describe '.dispatch' do
+    let(:sampling_strategy) { ->(_type, _ctx) { false } }
+
+    before do
+      allow(Telescope.configuration).to receive(:sampling_strategy).and_return(sampling_strategy)
+    end
+
     context 'with invalid context' do
       let(:context) { 'invalid' }
 
@@ -40,25 +46,11 @@ RSpec.describe Telescope::Dispatcher do
       end
     end
 
-    describe 'sampling' do
-      let(:sampling_strategy) { ->(_type, _ctx) { true } }
+    describe 'filtering' do
       let(:async_dispatcher) { nil }
 
-      before do
-        allow(Telescope.configuration).to receive(:sampling_strategy).and_return(sampling_strategy)
-      end
-
-      context 'when sampling strategy returns true' do
+      context 'when filtering strategy returns true' do
         let(:sampling_strategy) { ->(_type, _ctx) { true } }
-
-        it 'dispatches the event' do
-          expect(adapter).to receive(:send_trace).with(payload, context)
-          described_class.dispatch(:trace, payload, context)
-        end
-      end
-
-      context 'when sampling strategy returns false' do
-        let(:sampling_strategy) { ->(_type, _ctx) { false } }
 
         it 'skips dispatching the event' do
           expect(adapter).not_to receive(:send_trace)
@@ -68,6 +60,15 @@ RSpec.describe Telescope::Dispatcher do
         it 'still yields the block if given' do
           expect(adapter).not_to receive(:send_trace)
           expect { |b| described_class.dispatch(:trace, payload, context, &b) }.to yield_control
+        end
+      end
+
+      context 'when filtering strategy returns false' do
+        let(:sampling_strategy) { ->(_type, _ctx) { false } }
+
+        it 'dispatches the event' do
+          expect(adapter).to receive(:send_trace).with(payload, context)
+          described_class.dispatch(:trace, payload, context)
         end
       end
     end

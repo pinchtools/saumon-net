@@ -15,6 +15,24 @@ module Telescope
           end
         end
 
+        def send_log(message, context = {})
+          raise Telescope::AdapterConfigurationError, "Sentry is not configured" unless sentry_configured?
+
+          ::Sentry.with_scope do |scope|
+            set_scope_context(scope, context)
+            begin
+              case context[:priority]&.to_sym
+              when :high
+                ::Sentry.logger.warn(message)
+              else
+                ::Sentry.logger.info(message)
+              end
+            rescue StandardError => e
+              raise ::Telescope::AdapterError, "Sentry log: #{e.message}", cause: e
+            end
+          end
+        end
+
         def send_trace(name, payload = {}, context = {})
           raise AdapterConfigurationError, "Sentry is not configured" unless sentry_configured?
 

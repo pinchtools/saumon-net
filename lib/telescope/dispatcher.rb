@@ -5,8 +5,8 @@ module Telescope
         raise InvalidContextError, "Context must be a Hash" unless context.is_a?(Hash)
 
         return yield if block_given? && !enabled?
-        return yield if block_given? && !should_sample?(type, context)
-        return if !should_sample?(type, context)
+        return yield if block_given? && should_filter?(type, context)
+        return if should_filter?(type, context)
 
         if should_dispatch_async?(type, context)
           dispatch_async(type, payload, context)
@@ -43,12 +43,13 @@ module Telescope
 
       def should_dispatch_async?(type, context)
         return false if type == :error && context[:severity] == :critical
+        return false if type == :log && context[:priority] == :high
         return false if Telescope.configuration.async_dispatcher.nil?
 
         true
       end
 
-      def should_sample?(type, context)
+      def should_filter?(type, context)
         strategy = Telescope.configuration.sampling_strategy
         strategy.call(type, context)
       end

@@ -8,6 +8,12 @@ module Telescope
           Rails.logger.error(error.backtrace.join("\n")) if error.backtrace
         end
 
+        def send_log(message, context = {})
+          log_method = context[:priority]&.to_sym == :high ? :warn : :info
+          Rails.logger.send(log_method, "[Telescope] #{message}")
+          Rails.logger.send(log_method, context.to_json) if context.any?
+        end
+
         def send_trace(name, context = {}, &block)
           Rails.logger.info("[Telescope] #{name} started")
           Rails.logger.info(context.to_json) if context.any?

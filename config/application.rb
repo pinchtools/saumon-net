@@ -52,7 +52,7 @@ module SaumonNet
           case type
           when :error
             TelescopeJob.perform_now(type, payload, context)
-          when :trace
+          when :trace, :log
             if context[:priority] == :high
               TelescopeJob.perform_now(type, payload, context)
             else
@@ -62,11 +62,11 @@ module SaumonNet
         }
         config.sampling_rate = case Rails.env
         when "production"
-                                 1.0
+          0.0
         when "staging"
-                                 1.0
+          0.0
         else
-                                 1.0
+          0.0
         end
         config.filtered_parameters += Set.new([
                                                 Rails.application.config.filter_parameters,

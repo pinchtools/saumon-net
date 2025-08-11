@@ -27,6 +27,15 @@ RSpec.describe Telescope do
     end
   end
 
+  describe '.log' do
+    let(:message) { "Something interesting happened" }
+
+    it 'dispatches the log message through dispatcher' do
+      expect(described_class::Dispatcher).to receive(:dispatch).with(:log, message, enriched_context)
+      described_class.log(message, context)
+    end
+  end
+
   describe '.trace' do
     let(:trace_name) { 'test.trace' }
     let(:context) { { user_id: 1 } }

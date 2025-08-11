@@ -89,8 +89,8 @@ RSpec.describe Telescope::Configuration do
           context 'with high priority' do
             let(:context) { { priority: :high } }
 
-            it 'always samples high priority traces' do
-              expect(strategy.call(:trace, context)).to be true
+            it 'never samples high priority traces' do
+              expect(strategy.call(:trace, context)).to be false
             end
           end
 
