@@ -4,6 +4,8 @@ module AssembleeNationaleData
     include Rescuable
     include Configurable
 
+    SOURCE_TYPE = "ANOD".freeze
+
     def initialize
       @headers = {
         "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -11,7 +13,7 @@ module AssembleeNationaleData
 
       @config_file = YAML.load_file(Rails.root.join("config", "lib", "assemblee_nationale_data", "scraper.yml"))
 
-      @source = Source.find_by_code!("ANOD")
+      @source = Source.find_by_code!(SOURCE_TYPE)
     end
 
     def fetch_dataset(dataset_type, dataset_code, file_format: "json")
@@ -59,7 +61,7 @@ module AssembleeNationaleData
     private
 
     def load_dataset_config(dataset_type, dataset_code)
-      @config_file.dig(dataset_type, dataset_code)
+      @config_file.dig(SOURCE_TYPE, dataset_type, dataset_code)
     end
 
     def save_file(uri, dataset_code)

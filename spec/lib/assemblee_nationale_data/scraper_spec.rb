@@ -1,8 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe AssembleeNationaleData::Scraper do
+  let(:source_type) { 'ANOD' }
   let(:scraper) { described_class.new }
-  let(:source) { create(:source, code: 'ANOD') }
+  let(:source) { create(:source, code: source_type) }
   let(:headers) do
     {
       "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -10,10 +11,12 @@ RSpec.describe AssembleeNationaleData::Scraper do
   end
   let(:mock_config) do
     {
-      'DATASET_TYPE' => {
-        'DATASET_CODE' => {
-          'url' => '/test/path',
-          'code' => 'test_code'
+      source_type => {
+        'DATASET_TYPE' => {
+          'DATASET_CODE' => {
+            'url' => '/test/path',
+            'code' => 'test_code'
+          }
         }
       }
     }
@@ -133,7 +136,7 @@ RSpec.describe AssembleeNationaleData::Scraper do
     describe '#load_dataset_config' do
       it 'returns correct configuration for dataset' do
         config = scraper.send(:load_dataset_config, 'DATASET_TYPE', 'DATASET_CODE')
-        expect(config).to eq(mock_config['DATASET_TYPE']['DATASET_CODE'])
+        expect(config).to eq(mock_config[described_class::SOURCE_TYPE]['DATASET_TYPE']['DATASET_CODE'])
       end
     end
 
