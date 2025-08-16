@@ -1,24 +1,34 @@
-# README
+# Saumon Net
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Saumon-Net is a Rails 8 application designed to scrape, process, and store data produced by French Institutions. 
 
-Things you may want to cover:
+The application fetches datasets from official websites, processes them, and stores them in a structured format for further analysis.
 
-* Ruby version
+## Table of Contents
 
-* System dependencies
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
 
-* Configuration
+## Prerequisites
 
-* Database creation
+Before you begin, ensure you have the following installed:
 
-* Database initialization
+- **Ruby**: 3.4.2 (see [.ruby-version](.ruby-version))
+- **Rails**: 8.0
+- **PostgreSQL**: 17
 
-* How to run the test suite
+## Installation
 
-* Services (job queues, cache servers, search engines, etc.)
+### Docker Development
 
-* Deployment instructions
+1. **Build and start services**
+   ```bash
+   docker compose up --build
+   ```
 
-* ...
+2. **Setup the database**
+   ```bash
+   docker compose exec web bin/rails db:prepare
+   ```
+
+The application will be available at `http://localhost:3004`
