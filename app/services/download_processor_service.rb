@@ -44,6 +44,7 @@ class DownloadProcessorService
   def resolve_or_create_download
     download = CurrentDownloadResolverService.new(
       fingerprint: fingerprint,
+      dataset_code: dataset_code,
       source: source
     ).call
     download.name = filename

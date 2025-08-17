@@ -3,7 +3,8 @@ require 'rails_helper'
 RSpec.describe CurrentDownloadResolverService do
   let(:source) { create(:source) }
   let(:fingerprint) { 'abc123' }
-  let(:service) { described_class.new(fingerprint: fingerprint, source: source) }
+  let(:dataset_code) { 'AN_VOTE' }
+  let(:service) { described_class.new(fingerprint: fingerprint, dataset_code: dataset_code, source: source) }
 
   describe '#initialize' do
     it 'sets fingerprint and source' do
@@ -26,6 +27,11 @@ RSpec.describe CurrentDownloadResolverService do
       let(:fingerprint) { nil }
       it { expect(service).not_to be_valid }
     end
+
+    context 'dataset_code is nil' do
+      let(:dataset_code) { nil }
+      it { expect(service).not_to be_valid }
+    end
   end
 
   describe '#call' do
@@ -36,6 +42,7 @@ RSpec.describe CurrentDownloadResolverService do
       create(:download,
              source: existing_source,
              fingerprint: fingerprint,
+             dataset_code: dataset_code,
              version: 2,
              current: current
       )
@@ -48,6 +55,7 @@ RSpec.describe CurrentDownloadResolverService do
 
           expect(download).to be_new_record
           expect(download.fingerprint).to eq(fingerprint)
+          expect(download.dataset_code).to eq(dataset_code)
           expect(download.version).to eq(1)
           expect(download.current).to be true
           expect(download.source).to eq(source)

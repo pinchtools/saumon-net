@@ -30,7 +30,7 @@ RSpec.describe DownloadProcessorService do
 
   before do
     allow(CurrentDownloadResolverService).to receive(:new)
-                                               .with(fingerprint: fingerprint, source: source)
+                                               .with(fingerprint: fingerprint, dataset_code: dataset_code, source: source)
                                                .and_return(current_resolver_service)
     allow(current_resolver_service).to receive(:call).and_return(download)
     allow(HTTParty).to receive(:get).with(uri.to_s, headers: service.send(:download_headers))
