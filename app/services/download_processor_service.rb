@@ -20,7 +20,7 @@ class DownloadProcessorService
           attach_file(download, file_content)
         else
           log_file_already_exists
-          return download
+          return nil
         end
       else
         attach_file(download, file_content)

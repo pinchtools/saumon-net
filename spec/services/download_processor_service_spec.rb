@@ -80,13 +80,16 @@ RSpec.describe DownloadProcessorService do
       end
 
       it 'logs that file is already downloaded' do
-        result = service.call
+        service.call
 
         expect(Telescope).to have_received(:log).with(
           "File #{uri} is already downloaded",
           instance_of(Hash)
         )
-        expect(result).to eq(download)
+      end
+
+      it 'does not returns the download record' do
+        expect(service.call).to eq(nil)
       end
 
       it 'does not attach new file' do
