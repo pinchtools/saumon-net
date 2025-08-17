@@ -3,7 +3,7 @@ ANOD:
     AOCUR:
       url: "/acteurs/deputes-en-exercice"
       code: AMO40
-      annotation: "Split actors and organisms of the current "
+      annotation: "Split actors and organisms of the current legislature"
       dirs:
         - pays
     AOCOMP:
