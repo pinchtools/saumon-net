@@ -4,6 +4,26 @@ RSpec.describe Download, type: :model do
   describe "relations" do
     it { should belong_to(:source) }
     it { should have_one_attached(:file) }
+
+    describe "file attachment cleanup at record destroy" do
+      let(:download) { create(:download) }
+
+      it "purges attached file when download is destroyed" do
+        mock_file = StringIO.new("fake zip content")
+
+        download.file.attach(
+          io: mock_file,
+          filename: 'test.zip',
+          content_type: 'application/zip'
+        )
+
+        file_blob = download.file.blob
+
+        expect { download.destroy }
+          .to have_enqueued_job(ActiveStorage::PurgeJob)
+                .with(file_blob)
+      end
+    end
   end
 
   describe "validations" do
