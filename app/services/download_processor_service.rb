@@ -71,6 +71,7 @@ class DownloadProcessorService
   def create_new_version(current_download)
     DownloadVersioningService.new(
       name: current_download.name,
+      dataset_code: dataset_code,
       fingerprint: fingerprint,
       source: source
     ).call

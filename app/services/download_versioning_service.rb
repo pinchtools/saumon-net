@@ -1,11 +1,12 @@
 class DownloadVersioningService
   include Telescope::Rescuable
 
-  attr_reader :name, :fingerprint, :source
+  attr_reader :name, :fingerprint, :dataset_code, :source
 
-  def initialize(name:, fingerprint:, source:)
+  def initialize(name:, fingerprint:, dataset_code:, source:)
     @name = name
     @fingerprint = fingerprint
+    @dataset_code = dataset_code
     @source = source
   end
 
@@ -17,6 +18,7 @@ class DownloadVersioningService
       source.downloads.create!(
         name: name,
         fingerprint: fingerprint,
+        dataset_code: dataset_code,
         version: next_version,
         current: true
       )

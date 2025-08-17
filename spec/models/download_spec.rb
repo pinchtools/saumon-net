@@ -28,10 +28,18 @@ RSpec.describe Download, type: :model do
 
   describe "validations" do
     let(:fingerprint) {  "A1234" }
+    let(:dataset_code) { "AN-VOTE" }
     let(:name) { "AMP1234.csv" }
     let(:version) { 1 }
     let(:current) { true }
-    subject { create(:download, name: name, fingerprint: fingerprint, version: version, current: current) }
+    subject do
+      create(:download,
+             name: name,
+             fingerprint: fingerprint,
+             dataset_code: dataset_code,
+             version: version,
+             current: current)
+    end
 
     it { expect(subject).to be_valid }
 
@@ -43,6 +51,12 @@ RSpec.describe Download, type: :model do
 
     context "fingerprint is missing" do
       let(:fingerprint) { "" }
+
+      it { expect { subject.valid }.to raise_error(ActiveRecord::RecordInvalid) }
+    end
+
+    context "dataset code is missing" do
+      let(:dataset_code) { nil }
 
       it { expect { subject.valid }.to raise_error(ActiveRecord::RecordInvalid) }
     end

@@ -7,6 +7,7 @@ RSpec.describe DownloadProcessorService do
   let(:dataset_code) { 'test_dataset' }
   let(:source) { create(:source, code: 'TEST') }
   let(:fingerprint) { Digest::MD5.hexdigest(dataset_code + uri.to_s) }
+  let(:dataset_code) { 'AN_VOTE' }
   let(:filename) { 'test_file.json' }
   let(:response_body) { '{"data": "test content"}' }
   let(:file_checksum) { Digest::MD5.hexdigest(response_body) }
@@ -19,7 +20,13 @@ RSpec.describe DownloadProcessorService do
   end
   let(:current_resolver_service) { instance_double(CurrentDownloadResolverService) }
   let(:versioning_service) { instance_double(DownloadVersioningService) }
-  let(:download) { create(:download, source: source, fingerprint: fingerprint, name: filename) }
+  let(:download) do
+    create(:download,
+           source: source,
+           fingerprint: fingerprint,
+           dataset_code: dataset_code,
+           name: filename)
+  end
 
   before do
     allow(CurrentDownloadResolverService).to receive(:new)
@@ -106,15 +113,25 @@ RSpec.describe DownloadProcessorService do
     context 'when file is attached with different checksum' do
       let(:existing_checksum) { 'different_checksum' }
       let(:file_attachment) { double('ActiveStorage::Attached', attached?: true, checksum: existing_checksum) }
-      let(:new_download) { create(:download, source: source, fingerprint: fingerprint, name: filename, version: 2) }
+      let(:new_download) do
+        create(:download,
+               source: source,
+               fingerprint: fingerprint,
+               dataset_code: dataset_code,
+               name: filename,
+               version: 2)
+      end
 
       before do
         # simulate that the download versioning service returns a different checksum than the http request
         allow(download).to receive(:file).and_return(file_attachment)
 
-        # and then mock the DownloadVersioningService with the new download as checksum is detectec as !=
+        # and then mock the DownloadVersioningService with the new download as checksum is different
         allow(DownloadVersioningService).to receive(:new)
-                                              .with(name: download.name, fingerprint: fingerprint, source: source)
+                                              .with(name: download.name,
+                                                    fingerprint: fingerprint,
+                                                    dataset_code: dataset_code,
+                                                    source: source)
                                               .and_return(versioning_service)
         allow(versioning_service).to receive(:call).and_return(new_download)
         allow(new_download).to receive(:file).and_return(double('file_attachment', attach: true))
@@ -127,6 +144,7 @@ RSpec.describe DownloadProcessorService do
         expect(DownloadVersioningService).to have_received(:new).with(
           name: download.name,
           fingerprint: fingerprint,
+          dataset_code: dataset_code,
           source: source
         )
         expect(versioning_service).to have_received(:call)

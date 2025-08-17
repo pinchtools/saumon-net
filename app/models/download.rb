@@ -8,4 +8,5 @@ class Download < ApplicationRecord
 
   validates :fingerprint, presence: true, uniqueness: { scope: :version }
   validates :name, presence: true
+  validates :dataset_code, presence: true
 end

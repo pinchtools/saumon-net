@@ -4,11 +4,18 @@ RSpec.describe DownloadVersioningService do
   let(:name) { 'test_file.json' }
   let(:source) { create(:source) }
   let(:fingerprint) { 'abc123' }
-  let(:service) { described_class.new(name: name, fingerprint: fingerprint, source: source) }
+  let(:dataset_code) { 'AN_VOTE' }
+  let(:service) do
+    described_class.new(name: name,
+                        fingerprint: fingerprint,
+                        dataset_code: dataset_code,
+                        source: source)
+  end
 
   describe '#initialize' do
     it 'sets fingerprint and source' do
       expect(service.fingerprint).to eq(fingerprint)
+      expect(service.dataset_code).to eq(dataset_code)
       expect(service.source).to eq(source)
     end
   end
@@ -29,11 +36,13 @@ RSpec.describe DownloadVersioningService do
     let(:existing_name) { name }
     let(:existing_source) { source }
     let(:existing_fingerprint) { fingerprint }
+    let(:existing_dataset_code) { dataset_code }
     let(:existing_download) do
       create(:download,
              name: existing_name,
              source: existing_source,
              fingerprint: existing_fingerprint,
+             dataset_code: existing_dataset_code,
              version: 2,
              current: current
       )
@@ -46,13 +55,12 @@ RSpec.describe DownloadVersioningService do
 
           expect(download).to be_persisted
           expect(download.fingerprint).to eq(fingerprint)
+          expect(download.dataset_code).to eq(dataset_code)
           expect(download.version).to eq(1)
           expect(download.current).to be true
           expect(download.source).to eq(source)
         end
       end
-
-
 
       context 'with existing non-current downloads' do
         before { existing_download }
