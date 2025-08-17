@@ -13,6 +13,7 @@ RSpec.describe DownloadProcessorService do
   let(:file_checksum) { Digest::MD5.hexdigest(response_body) }
   let(:http_response) do
     instance_double('HTTParty::Response',
+                    code: 200,
                     success?: true,
                     body: response_body,
                     headers: { 'content-type' => 'application/json' }
@@ -33,8 +34,10 @@ RSpec.describe DownloadProcessorService do
                                                .with(fingerprint: fingerprint, dataset_code: dataset_code, source: source)
                                                .and_return(current_resolver_service)
     allow(current_resolver_service).to receive(:call).and_return(download)
+    allow(HTTParty).to receive(:head).with(uri.to_s, headers: service.send(:download_headers))
+                                     .and_return(http_response)
     allow(HTTParty).to receive(:get).with(uri.to_s, headers: service.send(:download_headers))
-                                    .and_yield(http_response).and_return(http_response)
+                                    .and_yield(response_body).and_return(response_body)
     allow(Telescope).to receive(:log)
   end
 
@@ -220,6 +223,7 @@ RSpec.describe DownloadProcessorService do
 
         expect(CurrentDownloadResolverService).to have_received(:new).with(
           fingerprint: fingerprint,
+          dataset_code: dataset_code,
           source: source
         )
         expect(result).to eq(download)
@@ -234,7 +238,9 @@ RSpec.describe DownloadProcessorService do
           uri.to_s,
           headers: service.send(:download_headers)
         )
-        expect(result).to eq(http_response)
+        expect(result.code).to eq(200)
+        expect(result.body).to eq(response_body)
+        expect(result.headers).to eq({ 'content-type' => 'application/json' })
       end
     end
 

@@ -1,4 +1,3 @@
-# lib/assemblee_nationale_data/scraper.rb
 module AssembleeNationaleData
   class Scraper
     include Rescuable

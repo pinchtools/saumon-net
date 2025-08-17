@@ -1,3 +1,4 @@
+require "ostruct"
 class DownloadProcessorService
   include Telescope::Rescuable
 
@@ -53,13 +54,19 @@ class DownloadProcessorService
 
   def download_file_content
     @file_content ||= begin
-                        response = nil
+                        head_response = HTTParty.head(uri.to_s, headers: download_headers)
+                        raise Telescope::NetworkError, "Failed to download: #{head_response.code}" unless head_response.success?
+
+                        content = String.new
                         HTTParty.get(uri.to_s, headers: download_headers) do |chunk|
-                          response = chunk
+                          content << chunk.to_s
                         end
 
-                        raise Telescope::NetworkError, "Failed to download: #{response.code}" unless response.success?
-                        response
+                        OpenStruct.new(
+                          body: content,
+                          headers: head_response.headers,
+                          code: head_response.code
+                        )
                       end
   end
 
