@@ -25,14 +25,13 @@ RSpec.describe AssembleeNationaleData::Scraper do
 
   before do
     AssembleeNationaleData.base_url = env_domain
-    allow(YAML).to receive(:load_file).and_return(mock_config)
+    allow(AssembleeNationaleData::Configurable).to receive(:scraper_config_file).and_return(mock_config)
     allow(Source).to receive(:find_by_code!).with(source.code).and_return(source)
   end
 
   describe '#initialize' do
     it 'sets up headers and loads configuration' do
       expect(scraper.instance_variable_get(:@headers)).to eq(headers)
-      expect(scraper.instance_variable_get(:@config_file)).to eq(mock_config)
     end
 
     it 'finds the correct source' do

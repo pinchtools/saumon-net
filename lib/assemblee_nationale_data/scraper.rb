@@ -9,9 +9,6 @@ module AssembleeNationaleData
       @headers = {
         "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
       }
-
-      @config_file = YAML.load_file(Rails.root.join("config", "lib", "assemblee_nationale_data", "scraper.yml"))
-
       @source = Source.find_by_code!(SOURCE_TYPE)
     end
 
@@ -22,7 +19,7 @@ module AssembleeNationaleData
         raise StandardError, "Missing configuration for dataset: #{dataset_type}/#{dataset_code}"
       end
 
-      response = HTTParty.get([ base_url, config.dig("url") ].join, headers: @headers)
+      response = HTTParty.get([ Configurable.base_url, config.dig("url") ].join, headers: @headers)
 
       unless response.success?
         raise Telescope::NetworkError, "Failed to fetch data: #{response.code}"
@@ -44,7 +41,7 @@ module AssembleeNationaleData
 
       if json_uri.relative?
         json_link.prepend("/") unless json_link.start_with?("/")
-        json_link.prepend(base_url)
+        json_link.prepend(Configurable.base_url)
         json_uri = URI.parse(json_link)
       end
 
@@ -60,7 +57,7 @@ module AssembleeNationaleData
     private
 
     def load_dataset_config(dataset_type, dataset_code)
-      @config_file.dig(SOURCE_TYPE, dataset_type, dataset_code)
+      Configurable.scraper_config_file.dig(SOURCE_TYPE, dataset_type, dataset_code)
     end
 
     def save_file(uri, dataset_code)
