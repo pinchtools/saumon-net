@@ -9,11 +9,11 @@ RSpec.describe EventJob, type: :job do
     [
       {
         job: 'TestJob',
-        args: [:user_id, :email]
+        args: [ :user_id, :email ]
       },
       {
         job: 'AnotherTestJob',
-        args: [:user_id, 'static_value']
+        args: [ :user_id, 'static_value' ]
       },
       {
         job: 'TestWithNoArgsJob'
@@ -53,10 +53,10 @@ RSpec.describe EventJob, type: :job do
       end
 
       it 'handles payload keys that do not exist' do
-        missing_key_subscribers = [{
+        missing_key_subscribers = [ {
                                      job: 'TestJob',
-                                     args: [:nonexistent_key, :user_id]
-                                   }]
+                                     args: [ :nonexistent_key, :user_id ]
+                                   } ]
 
         allow(Rails.application.config).
           to receive(:event_subscribers).and_return({
@@ -79,7 +79,7 @@ RSpec.describe EventJob, type: :job do
 
     context 'when job class cannot be constantized' do
       let(:invalid_subscribers) do
-        [{ job: 'NonExistentJob', args: [:user_id] }]
+        [ { job: 'NonExistentJob', args: [ :user_id ] } ]
       end
 
       before do
@@ -97,8 +97,8 @@ RSpec.describe EventJob, type: :job do
 
       it 'continues processing other valid subscribers after NameError' do
         mixed_subscribers = [
-          { job: 'NonExistentJob', args: [:user_id] },
-          { job: 'TestJob', args: [:email] }
+          { job: 'NonExistentJob', args: [ :user_id ] },
+          { job: 'TestJob', args: [ :email ] }
         ]
 
         allow(Rails.application.config).to receive(:event_subscribers).and_return({
@@ -118,7 +118,7 @@ RSpec.describe EventJob, type: :job do
 
     context 'integration test with actual job enqueuing' do
       it 'actually enqueues the jobs' do
-        subscribers = [{ job: 'TestJob', args: [:user_id] }]
+        subscribers = [ { job: 'TestJob', args: [ :user_id ] } ]
         allow(Rails.application.config).to receive(:event_subscribers).and_return({
                                                                                     event_name => subscribers
                                                                                   })
