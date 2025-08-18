@@ -2,7 +2,6 @@ require 'rails_helper'
 
 
 RSpec.describe AssembleeNationaleData::Configurable, :memoization_cleanup do
-
   let(:sample_config) do
     {
       "ANOD" => {
