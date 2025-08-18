@@ -12,7 +12,7 @@ module AssembleeNationaleData
         scraper_config_file.flat_map do |code, types|
           types.flat_map do |type, confs|
             confs.map do |conf_name, attrs|
-              [ conf_name, attrs.merge("source_code" => code, "entity_type" => type) ]
+              [ conf_name, attrs.merge("source_code" => code, "dataset_type" => type) ]
             end
           end
         end.to_h

@@ -74,13 +74,13 @@ RSpec.describe AssembleeNationaleData::Configurable, :memoization_cleanup do
                             "url" => "deputes/current",
                             "code" => "deputes_current",
                             "source_code" => "ANOD",
-                            "entity_type" => "deputes"
+                            "dataset_type" => "deputes"
                           },
                           "2022" => {
                             "url" => "votes/2022",
                             "code" => "votes_2022",
                             "source_code" => "ANOD",
-                            "entity_type" => "votes"
+                            "dataset_type" => "votes"
                           }
                         )
     end
@@ -92,7 +92,7 @@ RSpec.describe AssembleeNationaleData::Configurable, :memoization_cleanup do
       expect(current_config).to have_key("url")
       expect(current_config).to have_key("code")
       expect(current_config).to have_key("source_code")
-      expect(current_config).to have_key("entity_type")
+      expect(current_config).to have_key("dataset_type")
     end
 
     it "handles empty configuration gracefully" do
