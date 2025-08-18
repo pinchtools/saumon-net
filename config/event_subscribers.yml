@@ -1,0 +1,4 @@
+anod.download_resource.completed:
+  - job: AssembleeNationaleData::ProcessDownloadedResourceJob
+    args:
+      - :download_id
