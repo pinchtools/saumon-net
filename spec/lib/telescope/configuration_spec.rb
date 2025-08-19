@@ -54,12 +54,6 @@ RSpec.describe Telescope::Configuration do
       describe 'default strategy behavior' do
         let(:strategy) { configuration.sampling_strategy }
 
-        context 'with error type' do
-          it 'always samples errors' do
-            expect(strategy.call(:error, {})).to be true
-          end
-        end
-
         shared_examples 'sampling with probability' do |event_type|
           before do
             configuration.sampling_rate = 0.5
@@ -80,6 +74,22 @@ RSpec.describe Telescope::Configuration do
             it 'does not sample the event' do
               expect(strategy.call(event_type, context)).to be false
             end
+          end
+        end
+
+        context 'with error type' do
+          let(:context) { {} }
+
+          context 'with critical severity' do
+            let(:context) { { severity: :critical } }
+
+            it 'never samples high priority traces' do
+              expect(strategy.call(:error, context)).to be false
+            end
+          end
+
+          context 'with regular severity' do
+            it_behaves_like 'sampling with probability', :error
           end
         end
 

@@ -20,15 +20,9 @@ module Telescope
       @sampling_strategy ||= ->(type, context) {
         case type
         when :error
-          context[:severity] != :critical
-        when :log
-          context[:priority] != :high
-        when :trace
-          if context[:priority] == :high
-            false
-          else
-            Random.rand <= sampling_rate
-          end
+          (context[:severity] == :critical) ? false : Random.rand <= sampling_rate
+        when :log, :trace
+          (context[:priority] == :high) ? false : Random.rand <= sampling_rate
         else
           Random.rand <= sampling_rate
         end
