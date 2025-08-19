@@ -45,7 +45,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
         hash_including(
           error_type: "network",
           class: test_class.name,
-          timestamp: current_time
+          timestamp: current_time.to_i
         )
       )
 
@@ -61,7 +61,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
           hash_including(
             error_type: "record",
             class: test_class.name,
-            timestamp: current_time
+            timestamp: current_time.to_i,
           )
         )
 
@@ -91,7 +91,7 @@ RSpec.describe AssembleeNationaleData::Rescuable do
         kind_of(StandardError),
         hash_including(
           class: test_class.name,
-          timestamp: current_time
+          timestamp: current_time.to_i
         )
       )
 

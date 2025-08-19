@@ -18,7 +18,7 @@ module Telescope
     def default_context
       {
         class: self.class.name,
-        timestamp: Time.current
+        timestamp: Time.current.to_i
       }
     end
   end

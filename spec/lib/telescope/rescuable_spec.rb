@@ -42,7 +42,7 @@ RSpec.describe Telescope::Rescuable do
           instance_of(StandardError),
           {
             class: instance.class.name,
-            timestamp: Time.current
+            timestamp: Time.current.to_i
           }
         )
 
