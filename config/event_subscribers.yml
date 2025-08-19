@@ -2,3 +2,8 @@ anod.download_resource.completed:
   - job: AssembleeNationaleData::ProcessDownloadedResourceJob
     args:
       - :download_id
+  - job: Telescope::LogJob
+    args:
+      - "download completed"
+      - download_id: :download_id
+        triggered_ts: :triggered_ts

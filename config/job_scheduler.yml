@@ -21,3 +21,7 @@
 sidekiq_job_report_queue_sizes:
   cron: "*/5 * * * *"
   class: "SidekiqJob::ReportQueueSizesJob"
+
+anod_download_ressources:
+  cron: "0 2 * * *"
+  class: "AssembleeNationaleData::DownloadResourcesJob"
