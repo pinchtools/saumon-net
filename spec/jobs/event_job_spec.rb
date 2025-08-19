@@ -4,7 +4,7 @@ RSpec.describe EventJob, type: :job do
   include ActiveJob::TestHelper
 
   let(:event_name) { 'user_created' }
-  let(:payload) { { user_id: 123, email: 'test@example.com', name: 'John Doe' } }
+  let(:payload) { { user_id: 123, email: 'test@example.com', name: 'John Doe', triggered_at: '2025-01-01T12:00:00Z' } }
   let(:subscribers) do
     [
       {
@@ -17,6 +17,17 @@ RSpec.describe EventJob, type: :job do
       },
       {
         job: 'TestWithNoArgsJob'
+      },
+      {
+        job: 'TestWithHashContextJob',
+        args: [
+          'download completed',
+          {
+            user_id: :user_id,
+            triggered_at: :triggered_at,
+            environment: 'production'
+          }
+        ]
       }
     ]
   end
@@ -28,20 +39,23 @@ RSpec.describe EventJob, type: :job do
     allow(Telescope).to receive(:capture_error)
   end
 
-  describe '#perform' do
+  describe '#perfor m' do
     context 'when subscribers exist for the event' do
       let(:test_job_class) { class_double('TestJob') }
       let(:test_with_no_args_job_class) { class_double('TestWithNoArgsJob') }
       let(:another_test_job_class) { class_double('AnotherTestJob') }
+      let(:test_with_hash_context_job_class) { class_double('TestWithHashContextJob') }
 
       before do
         stub_const('TestJob', test_job_class)
         stub_const('AnotherTestJob', another_test_job_class)
         stub_const('TestWithNoArgsJob', test_with_no_args_job_class)
+        stub_const('TestWithHashContextJob', test_with_hash_context_job_class)
 
         allow(test_job_class).to receive(:perform_later)
         allow(another_test_job_class).to receive(:perform_later)
         allow(test_with_no_args_job_class).to receive(:perform_later)
+        allow(test_with_hash_context_job_class).to receive(:perform_later)
       end
 
       it 'enqueues jobs for all subscribers' do
@@ -50,6 +64,14 @@ RSpec.describe EventJob, type: :job do
         expect(test_job_class).to have_received(:perform_later).with(123, 'test@example.com')
         expect(another_test_job_class).to have_received(:perform_later).with(123, 'static_value')
         expect(test_with_no_args_job_class).to have_received(:perform_later).with(no_args)
+        expect(test_with_hash_context_job_class).to have_received(:perform_later).with(
+          'download completed',
+          {
+            user_id: 123,
+            triggered_at: '2025-01-01T12:00:00Z',
+            environment: 'production'
+          }
+        )
       end
 
       it 'handles payload keys that do not exist' do
