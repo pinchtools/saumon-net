@@ -11,6 +11,7 @@ RSpec.describe DownloadProcessorService do
   let(:filename) { 'test_file.json' }
   let(:response_body) { '{"data": "test content"}' }
   let(:file_checksum) { Digest::MD5.hexdigest(response_body) }
+  let(:download_checksum) { nil }
   let(:http_response) do
     instance_double('HTTParty::Response',
                     code: 200,
@@ -26,6 +27,7 @@ RSpec.describe DownloadProcessorService do
            source: source,
            fingerprint: fingerprint,
            dataset_code: dataset_code,
+           checksum: download_checksum,
            name: filename)
   end
 
@@ -83,7 +85,8 @@ RSpec.describe DownloadProcessorService do
     end
 
     context 'when file is attached with same checksum' do
-      let(:file_attachment) { double('ActiveStorage::Attached', attached?: true, checksum: file_checksum) }
+      let(:download_checksum) { file_checksum }
+      let(:file_attachment) { double('ActiveStorage::Attached', attached?: true) }
 
       before do
         allow(download).to receive(:file).and_return(file_attachment)
@@ -246,7 +249,8 @@ RSpec.describe DownloadProcessorService do
 
     describe '#file_needs_update?' do
       let(:file_content) { double('response', body: response_body) }
-      let(:file_attachment) { double('ActiveStorage::Attached', attached?: true, checksum: file_checksum) }
+      let(:download_checksum) { file_checksum }
+      let(:file_attachment) { double('ActiveStorage::Attached', attached?: true) }
 
       before do
         allow(download).to receive(:file).and_return(file_attachment)
@@ -261,9 +265,9 @@ RSpec.describe DownloadProcessorService do
 
       context 'when checksums differ' do
         let(:response_body) { 'different content' }
+        let(:download_checksum) { 'old_checksum' }
 
         it 'returns true' do
-          allow(download).to receive_message_chain(:file, :checksum).and_return('old_checksum')
           result = service.send(:file_needs_update?, download, file_content)
           expect(result).to be true
         end

@@ -27,6 +27,7 @@ class DownloadProcessorService
         attach_file(download, file_content)
       end
 
+      download.checksum = checksum(file_content)
       download.tap(&:save!)
     end
   end
@@ -71,9 +72,13 @@ class DownloadProcessorService
   end
 
   def file_needs_update?(download, file_content)
-    new_checksum = Digest::MD5.hexdigest(file_content.body)
+    new_checksum = checksum(file_content)
 
-    download.file.checksum != new_checksum
+    download.checksum != new_checksum
+  end
+
+  def checksum(file_content)
+    Digest::MD5.hexdigest(file_content.body)
   end
 
   def create_new_version(current_download)

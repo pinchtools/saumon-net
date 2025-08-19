@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_17_134953) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_19_131909) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -51,6 +51,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_17_134953) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "dataset_code", null: false
+    t.string "checksum"
     t.index ["fingerprint", "version"], name: "index_downloads_on_fingerprint_and_version", unique: true
     t.index ["fingerprint"], name: "index_downloads_on_fingerprint_where_current_true", unique: true, where: "(current = true)"
     t.index ["name"], name: "index_downloads_on_name"
