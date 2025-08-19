@@ -37,7 +37,6 @@ module Telescope
         async_dispatcher = Telescope.configuration.async_dispatcher
         return dispatch_sync(type, payload, context) unless async_dispatcher
 
-
         async_dispatcher.call(type, payload, context)
       end
 

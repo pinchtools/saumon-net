@@ -4,6 +4,7 @@ module Telescope
   autoload :Controllable, "telescope/controllable"
   autoload :Rescuable, "telescope/rescuable"
   autoload :RescueWrapper, "telescope/rescue_wrapper"
+  autoload :Adapters, "telescope/adapters"
 
   # Base error class for all Telescope errors
   class Error < StandardError; end
@@ -54,7 +55,7 @@ module Telescope
 
     def enrich_context(context)
       context.merge(
-        environment: Rails.env,
+        environment: Rails.env.to_s,
         timestamp: Time.current.to_i,
         process_id: Process.pid
       )
