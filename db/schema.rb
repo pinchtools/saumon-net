@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_19_131909) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_20_141651) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -69,6 +69,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_19_131909) do
     t.index ["metadata"], name: "index_entities_on_metadata", using: :gin
     t.index ["type"], name: "index_entities_on_type"
     t.index ["uid"], name: "index_entities_on_uid", unique: true
+  end
+
+  create_table "extracted_files", force: :cascade do |t|
+    t.string "path", null: false
+    t.bigint "download_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["download_id"], name: "index_extracted_files_on_download_id"
+    t.index ["path", "download_id"], name: "index_extracted_files_on_path_and_download_id", unique: true
   end
 
   create_table "sources", force: :cascade do |t|

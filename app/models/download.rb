@@ -5,6 +5,8 @@
 class Download < ApplicationRecord
   has_one_attached :file, dependent: :purge_later
   belongs_to :source
+  has_many :entities, dependent: :destroy
+  has_many :extracted_files, dependent: :destroy
 
   validates :fingerprint, presence: true, uniqueness: { scope: :version }
   validates :name, presence: true
