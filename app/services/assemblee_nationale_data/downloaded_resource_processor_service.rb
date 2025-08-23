@@ -10,30 +10,25 @@ class AssembleeNationaleData::DownloadedResourceProcessorService
       return validation
     end
 
-    process = case @download.file.blob.content_type
+    process_result = case @download.file.blob.content_type
     when "application/zip"
                 AssembleeNationaleData::ZipExtractorService.new(@download.file).call
     else
                 failure("unsupported content type")
     end
 
-    return failure("failed to process file") unless process.success?
-
-    success
+    process_result
   end
 
   def validate
     return failure("missing parameters") unless @download.present?
     return failure("no file attached") unless @download.file.attached?
 
-    true
+    success
   end
 
   def success
-    OpenStruct.new(
-      success?: true,
-      error_message: nil
-    )
+    OpenStruct.new(success?: true)
   end
 
   def failure(message)

@@ -6,11 +6,10 @@ RSpec.describe AssembleeNationaleData::DownloadedResourceProcessorService do
   let(:download_present) { true }
   let(:file_attached) { true }
   let(:download) { instance_double('Download', present?: download_present, file: file) }
-  let(:file) { instance_double('ActiveStorage::Attachement', attached?: file_attached, blob: blob) }
+  let(:file) { double('ActiveStorage::Attached::One', attached?: file_attached, blob: blob) }
   let(:blob) { instance_double('ActiveStorage::Blob', content_type: content_type) }
   let(:zip_extractor_service) { instance_double('AssembleeNationaleData::ZipExtractorService') }
   let(:content_type) { 'application/zip' }
-  let(:success_message) { nil }
   let(:error_message) { 'test error' }
 
   describe '#initialize' do
@@ -36,36 +35,38 @@ RSpec.describe AssembleeNationaleData::DownloadedResourceProcessorService do
 
     context 'when validation passes' do
       before do
-        allow(service).to receive(:validate).and_return(service.success)
+        allow(service).to receive(:validate).and_return(OpenStruct.new(success?: true))
       end
 
       context 'with zip file' do
-        let(:process_result) { service.success }
+        let(:zip_success_result) { OpenStruct.new(success?: true, success: 'zip_success_object') }
 
         before do
           allow(AssembleeNationaleData::ZipExtractorService).to receive(:new).with(file).and_return(zip_extractor_service)
-          allow(zip_extractor_service).to receive(:call).and_return(process_result)
+          allow(zip_extractor_service).to receive(:call).and_return(zip_success_result)
         end
 
         context 'when processing succeeds' do
-          it 'processes the zip file and returns success' do
+          it 'processes the zip file and returns the success object from zip service' do
             result = service.call
 
             expect(AssembleeNationaleData::ZipExtractorService).to have_received(:new).with(file)
             expect(zip_extractor_service).to have_received(:call)
-            expect(result.success?).to be true
-            expect(result.error_message).to be_nil
+            expect(result).to eq(zip_success_result)
           end
         end
 
         context 'when processing fails' do
-          let(:process_result) { service.failure('processing failed') }
+          let(:zip_failure_result) { OpenStruct.new(success?: false, error_message: 'zip processing failed') }
 
-          it 'returns failure with error message' do
+          before do
+            allow(zip_extractor_service).to receive(:call).and_return(zip_failure_result)
+          end
+
+          it 'returns failure with generic error message' do
             result = service.call
 
-            expect(result.success?).to be false
-            expect(result.error_message).to eq('failed to process file')
+            expect(result).to eq(zip_failure_result)
           end
         end
       end
@@ -77,7 +78,7 @@ RSpec.describe AssembleeNationaleData::DownloadedResourceProcessorService do
           result = service.call
 
           expect(result.success?).to be false
-          expect(result.error_message).to eq('failed to process file')
+          expect(result.error_message).to eq('unsupported content type')
           expect(AssembleeNationaleData::ZipExtractorService).not_to receive(:new)
         end
       end
@@ -108,17 +109,7 @@ RSpec.describe AssembleeNationaleData::DownloadedResourceProcessorService do
     end
 
     context 'when download is present and file is attached' do
-      it { expect(service.validate).to be true }
-    end
-  end
-
-  describe '#success' do
-    it 'returns successful OpenStruct' do
-      result = service.success
-
-      expect(result).to be_a(OpenStruct)
-      expect(result.success?).to be true
-      expect(result.error_message).to be_nil
+      it { expect(service.validate).to eq(OpenStruct.new(success?: true)) }
     end
   end
 
