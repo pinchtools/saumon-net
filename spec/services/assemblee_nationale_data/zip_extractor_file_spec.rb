@@ -7,7 +7,7 @@ RSpec.describe AssembleeNationaleData::ZipExtractorService do
   let(:filename) { zip_filename }
   let(:attachment_id) { 123 }
   let(:attachment) do
-    instance_double('ActiveStorage::Attachement',
+    double('ActiveStorage::Attached::One',
                     attached?: is_attached,
                     blob: blob,
                     filename: filename,
