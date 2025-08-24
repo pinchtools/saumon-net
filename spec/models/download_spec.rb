@@ -4,8 +4,8 @@ RSpec.describe Download, type: :model do
   describe "relations" do
     it { should belong_to(:source) }
     it { should have_one_attached(:file) }
-    it { should have_many(:entities) }
-    it { should have_many(:extracted_files) }
+    it { should have_many(:entities).dependent(:destroy) }
+    it { should have_many(:extracted_files).dependent(:destroy) }
 
     describe "file attachment cleanup at record destroy" do
       let(:download) { create(:download) }
