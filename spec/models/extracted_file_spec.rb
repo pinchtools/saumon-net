@@ -4,6 +4,7 @@ RSpec.describe ExtractedFile, type: :model do
   describe "associations" do
     it { should belong_to(:download) }
     it { should have_one_attached(:file) }
+    it { should have_many(:entities).dependent(:destroy) }
 
     describe "file attachment cleanup at record destroy" do
       subject { create(:extracted_file) }

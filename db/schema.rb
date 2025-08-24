@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_20_141651) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_24_131832) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,7 +65,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_141651) do
     t.bigint "download_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "extracted_file_id"
     t.index ["download_id"], name: "index_entities_on_download_id"
+    t.index ["extracted_file_id"], name: "index_entities_on_extracted_file_id"
     t.index ["metadata"], name: "index_entities_on_metadata", using: :gin
     t.index ["type"], name: "index_entities_on_type"
     t.index ["uid"], name: "index_entities_on_uid", unique: true
@@ -90,4 +92,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_20_141651) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "entities", "extracted_files", on_delete: :cascade
 end

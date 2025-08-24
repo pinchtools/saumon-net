@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Entity, type: :model do
   describe "relationships" do
     it { should belong_to :download }
+
+    it { should belong_to(:extracted_file).optional }
   end
 
   describe "validations" do
