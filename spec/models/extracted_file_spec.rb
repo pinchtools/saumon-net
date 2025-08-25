@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ExtractedFile, type: :model do
+  subject { build(:extracted_file) }
+
   describe "associations" do
     it { should belong_to(:download) }
     it { should have_one_attached(:file) }
@@ -28,8 +30,6 @@ RSpec.describe ExtractedFile, type: :model do
   end
 
   describe "validations" do
-    subject { build(:extracted_file) }
-
     it { should validate_presence_of(:path) }
     it { should validate_presence_of(:download) }
 
@@ -50,6 +50,34 @@ RSpec.describe ExtractedFile, type: :model do
 
         duplicate = build(:extracted_file, download: download2, path: "test/file.csv")
         expect(duplicate).to be_valid
+      end
+    end
+  end
+
+  describe "#file_name" do
+    subject { build(:extracted_file, path: file_path) }
+
+    context "with file extension" do
+      let(:file_path) { "actors/PA123456.json" }
+
+      it "returns filename without extension" do
+        expect(subject.file_name).to eq("PA123456")
+      end
+    end
+
+    context "with no extension" do
+      let(:file_path) { "data/filename" }
+
+      it "returns full filename" do
+        expect(subject.file_name).to eq("filename")
+      end
+    end
+
+    context "with nested path" do
+      let(:file_path) { "deeply/nested/path/document.xml" }
+
+      it "returns basename without extension" do
+        expect(subject.file_name).to eq("document")
       end
     end
   end

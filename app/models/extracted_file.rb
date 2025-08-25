@@ -6,4 +6,8 @@ class ExtractedFile < ApplicationRecord
   validates :path, presence: true
   validates :download, presence: true
   validates :path, uniqueness: { scope: :download }
+
+  def file_name
+    File.basename(path, ".*")
+  end
 end
