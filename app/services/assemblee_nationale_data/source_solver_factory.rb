@@ -1,0 +1,8 @@
+class AssembleeNationaleData::SourceSolverFactory
+  def self.for(source_type)
+    case source_type
+    when "acteur"
+      AssembleeNationaleData::SourceSolver::Actor.new
+    end
+  end
+end
