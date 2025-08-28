@@ -3,6 +3,8 @@ class AssembleeNationaleData::SourceSolverFactory
     case source_type
     when "acteur"
       AssembleeNationaleData::SourceSolver::Actor.new
+    else
+      AssembleeNationaleData::SourceSolver::Default.new
     end
   end
 end

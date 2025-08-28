@@ -18,7 +18,7 @@ RSpec.describe AssembleeNationaleData::SourceSolverFactory do
       it "returns nil" do
         result = described_class.for(source_type)
 
-        expect(result).to be_nil
+        expect(result).to be_an_instance_of(AssembleeNationaleData::SourceSolver::Default)
       end
     end
   end
