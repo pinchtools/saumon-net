@@ -15,6 +15,7 @@ RSpec.describe AssembleeNationaleData::ExtractedFileParserService do
   let(:expected_uid) { "ANOD-PA123456" }
   let(:date_creation) { "2021-11-22T15:46:09.483279+00:00" }
   let(:legislature) { "17" }
+  let(:xmlns) { "http://www.assemblee-nationale.fr/schemas/1.0/acteur" }
 
   describe "#call" do
     let(:json_content) { file_content.to_json }
@@ -28,6 +29,7 @@ RSpec.describe AssembleeNationaleData::ExtractedFileParserService do
       let(:file_content) do
         {
           acteur: {
+            '@xmlns': xmlns,
             dateCreation: date_creation,
             legislature: legislature,
             details: {
@@ -56,6 +58,7 @@ RSpec.describe AssembleeNationaleData::ExtractedFileParserService do
         result = service.call
 
         expect(result[:root_data]).to eq({
+                                           '@xmlns': xmlns,
                                            date_creation: date_creation,
                                            legislature: legislature,
                                            details: {
@@ -81,6 +84,11 @@ RSpec.describe AssembleeNationaleData::ExtractedFileParserService do
         result = service.call
 
         expect(result[:metadata]).not_to have_key(:details)
+      end
+
+      it "excludes keys starting with @" do
+        result = service.call
+        expect(result[:metadata]).not_to have_key(:'@xmlns')
       end
     end
 

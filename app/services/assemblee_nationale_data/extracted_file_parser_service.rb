@@ -59,7 +59,7 @@ class AssembleeNationaleData::ExtractedFileParserService
 
     data.each do |key, value|
       if !value.is_a?(Hash) && !value.is_a?(Array)
-        metadata[key] = value
+        metadata[key] = value unless key.to_s.start_with?("@")
       elsif value.is_a?(Hash) && key == :uid
         metadata[key] = value
       end
