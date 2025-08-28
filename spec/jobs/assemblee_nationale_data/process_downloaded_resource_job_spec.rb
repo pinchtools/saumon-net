@@ -4,19 +4,24 @@ RSpec.describe AssembleeNationaleData::ProcessDownloadedResourceJob, type: :job 
   subject(:job) { described_class.new }
 
   let(:download_id) { 123 }
+  let(:download) { instance_double('Download', id: download_id) }
   let(:processor_service) { instance_double(AssembleeNationaleData::DownloadedResourceProcessorService) }
   let(:process_result) { instance_double('ProcessResult') }
   let(:file_ids) { [ 1, 2, 3 ] }
 
   before do
     allow(AssembleeNationaleData::DownloadedResourceProcessorService).to receive(:new)
-                                                   .with(download_id).and_return(processor_service)
+                                                   .with(download).and_return(processor_service)
     allow(processor_service).to receive(:call).and_return(process_result)
     allow(Telescope::LogJob).to receive(:perform_later)
     allow(EventJob).to receive(:perform_later)
   end
 
   describe '#perform' do
+    before do
+      allow(Download).to receive(:find).with(download_id).and_return(download)
+    end
+
     context 'when processing succeeds' do
       before do
         expect(process_result).to receive(:success?).and_return(true)
@@ -26,7 +31,7 @@ RSpec.describe AssembleeNationaleData::ProcessDownloadedResourceJob, type: :job 
       it 'processes the download and logs success' do
         job.perform(download_id)
 
-        expect(AssembleeNationaleData::DownloadedResourceProcessorService).to have_received(:new).with(download_id)
+        expect(AssembleeNationaleData::DownloadedResourceProcessorService).to have_received(:new).with(download)
         expect(processor_service).to have_received(:call)
         expect(Telescope::LogJob).to have_received(:perform_later).with(
           "Successfully processed the resource attached to the download",

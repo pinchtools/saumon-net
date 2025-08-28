@@ -2,7 +2,8 @@ class AssembleeNationaleData::ProcessDownloadedResourceJob < ApplicationJob
   queue_as :default
 
   def perform(download_id)
-    @process = AssembleeNationaleData::DownloadedResourceProcessorService.new(download_id).call
+    download = Download.find(download_id)
+    @process = AssembleeNationaleData::DownloadedResourceProcessorService.new(download).call
 
     context = { download_id: download_id, triggered_ts: Time.current.to_i }
     if @process.success?
@@ -12,6 +13,8 @@ class AssembleeNationaleData::ProcessDownloadedResourceJob < ApplicationJob
     else
       Telescope::LogJob.perform_later("An error occurred while trying to process the attached resource", context)
     end
+  rescue ActiveRecord::RecordNotFound => e
+    Telescope.capture_error(e, context: { download_id: download_id })
   end
 
   private
