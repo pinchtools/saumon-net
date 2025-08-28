@@ -7,3 +7,11 @@ anod.download_resource.completed:
       - "download completed"
       - download_id: :download_id
         triggered_ts: :triggered_ts
+anod.file_extraction.completed:
+  - job: AssembleeNationaleData::UpsertEntityJob
+    args:
+      - :file_id
+  - job: Telescope::LogJob
+    args:
+      - "file extraction completed"
+      - file_id: :file_id
