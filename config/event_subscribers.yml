@@ -15,3 +15,9 @@ anod.file_extraction.completed:
     args:
       - "file extraction completed"
       - file_id: :file_id
+anod.entity.upserted:
+  - job: Telescope::LogJob
+    args:
+      - "Entity upserted"
+      - entity_id: :entity_id
+        triggered_ts: :triggered_ts
