@@ -92,7 +92,7 @@ RSpec.describe Telescope::Adapters::Sentry do
         let(:context_with_priority) { context.merge(priority: priority) }
 
         it "logs message with #{priority} level" do
-          expect(logger).to receive(logger_method).with(message)
+          expect(logger).to receive(logger_method).with(message, context_with_priority)
           expect(scope).to receive(:set_extras).with(context_with_priority)
 
           described_class.send_log(message, context_with_priority)

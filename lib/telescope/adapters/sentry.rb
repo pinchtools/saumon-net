@@ -23,9 +23,9 @@ module Telescope
             begin
               case context[:priority]&.to_sym
               when :high
-                ::Sentry.logger.warn(message)
+                ::Sentry.logger.warn(message, filter_sensitive_data(context))
               else
-                ::Sentry.logger.info(message)
+                ::Sentry.logger.info(message, filter_sensitive_data(context))
               end
             rescue StandardError => e
               raise ::Telescope::AdapterError, "Sentry log: #{e.message}", cause: e
