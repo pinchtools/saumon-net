@@ -20,12 +20,12 @@ class AssembleeNationaleData::ProcessDownloadedResourceJob < ApplicationJob
   private
 
   def extracted_files?
-    @process.extracted_file_ids.present?
+    @process.data.extracted_file_ids.present?
   end
 
   def trigger_completed_extraction_file_events
-    @process.extracted_file_ids.each do |id|
-      EventJob.perform_later("anod.file_extraction.completed", id)
+    @process.data.extracted_file_ids.each do |id|
+      EventJob.perform_later("anod.file_extraction.completed", { file_id: id })
     end
   end
 end

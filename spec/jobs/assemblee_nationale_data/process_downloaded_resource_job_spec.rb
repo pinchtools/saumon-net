@@ -25,7 +25,7 @@ RSpec.describe AssembleeNationaleData::ProcessDownloadedResourceJob, type: :job 
     context 'when processing succeeds' do
       before do
         expect(process_result).to receive(:success?).and_return(true)
-        allow(process_result).to receive(:extracted_file_ids).and_return(file_ids)
+        allow(process_result).to receive_message_chain(:data, :extracted_file_ids).and_return(file_ids)
       end
 
       it 'processes the download and logs success' do
@@ -43,13 +43,13 @@ RSpec.describe AssembleeNationaleData::ProcessDownloadedResourceJob, type: :job 
         job.perform(download_id)
 
         file_ids.each do |file_id|
-          expect(EventJob).to have_received(:perform_later).with("anod.file_extraction.completed", file_id)
+          expect(EventJob).to have_received(:perform_later).with("anod.file_extraction.completed", { file_id: file_id })
         end
       end
 
       context 'when no files are extracted' do
         before do
-          allow(process_result).to receive(:extracted_file_ids).and_return([])
+          allow(process_result).to receive_message_chain(:data, :extracted_file_ids).and_return([])
         end
 
         it 'does not trigger extraction events' do
@@ -79,7 +79,7 @@ RSpec.describe AssembleeNationaleData::ProcessDownloadedResourceJob, type: :job 
 
   describe '#extracted_files?' do
     before do
-      allow(process_result).to receive(:extracted_file_ids).and_return(file_ids)
+      allow(process_result).to receive_message_chain(:data, :extracted_file_ids).and_return(file_ids)
       job.instance_variable_set(:@process, process_result)
     end
 

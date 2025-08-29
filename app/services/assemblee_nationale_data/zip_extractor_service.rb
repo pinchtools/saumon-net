@@ -37,11 +37,11 @@ class AssembleeNationaleData::ZipExtractorService
           next if entry.directory? || should_ignore_file?(entry)
 
           extracted_file = extract_and_attach_entry(entry)
-          extracted_file_ids << extracted_file if extracted_file
+          extracted_file_ids << extracted_file.id if extracted_file.present?
         end
       end
 
-      success(extracted_files_count: extracted_file_ids.count)
+      success(extracted_files_count: extracted_file_ids.count, extracted_file_ids: extracted_file_ids)
     rescue Zip::Error => e
       Telescope.capture_error(e, context: { attachment_id: attachment.id })
       failure("Failed to extract zip file: #{e.message}")

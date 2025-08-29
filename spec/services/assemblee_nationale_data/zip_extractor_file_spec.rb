@@ -17,7 +17,7 @@ RSpec.describe AssembleeNationaleData::ZipExtractorService do
   let(:blob) { instance_double('ActiveStorage::Blob', content_type: content_type) }
   let(:record) { instance_double('Download', dataset_code: dataset_code, extracted_files: extracted_files_relation) }
   let(:extracted_files_relation) { instance_double('ActiveRecord::Relation') }
-  let(:extracted_file) { instance_double('ExtractedFile', file: extracted_file_attachment) }
+  let(:extracted_file) { instance_double('ExtractedFile', file: extracted_file_attachment, id: 1) }
   let(:extracted_file_attachment) { instance_double('ActiveStorage::Attached::One') }
   let(:dataset_code) { 'AOCUR' }
   let(:zip_filename) { 'test_archive.zip' }
@@ -93,6 +93,7 @@ RSpec.describe AssembleeNationaleData::ZipExtractorService do
 
         expect(result.success?).to be true
         expect(result.data[:extracted_files_count]).to eq(extracted_files_count)
+        expect(result.data[:extracted_file_ids]).to eq([ extracted_file.id ])
         expect(service).to have_received(:cleanup_temp_file).with(temp_file)
       end
 
